@@ -14,7 +14,7 @@ class Controller extends BaseController
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
     public function getDevices(){
-    	$users = DB::table('device')->selectRaw("device_id as 'id',label, last_reported as `reported`, IF(HOUR(TIMEDIFF(NOW(), last_reported))>23,'No','Yes') AS `status`")->get();
+    	$users = DB::table('device')->selectRaw("device_id as 'id',label, last_reported as `reported`, IF(HOUR(TIMEDIFF(NOW(), last_reported))>23,'OFFLINE','OK') AS `status`")->get();
     	return response()->json($users);	
     }
 }

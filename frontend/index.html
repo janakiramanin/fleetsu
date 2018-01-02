@@ -92,8 +92,13 @@
                 dataType : 'json',
                 success : function (data)
                 {
+                  var bgColor='';
                   $.each( data, function( i, item ) {
-                    content +='<li class="list-group-item">'+item.label+'('+item.id+') <span class="badge">'+updateTime(item.reported)+'</span></li>';
+                    if(item.status == 'OK')
+                        bgColor = 'green';
+                      else
+                        bgColor = 'red';
+                    content +='<li class="list-group-item" >'+item.label+' ('+item.id+') <span class="badge" style="background-color: '+bgColor+';">'+updateTime(item.reported)+'</span></li>';
                     updateTime(item.reported);
                   });
                    $(content).appendTo("#deviceList");
