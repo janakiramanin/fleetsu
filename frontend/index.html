@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Assignment</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script src="js/jstz.js"></script>
+  <script src="js/moment.js"></script>
+  <script src="js/moment-timezone.js"></script>
+  <style>
+    /* Remove the navbar's default margin-bottom and rounded borders */ 
+    .navbar {
+      margin-bottom: 0;
+      border-radius: 0;
+    }
+    
+    /* Add a gray background color and some padding to the footer */
+    footer {
+      background-color: #f2f2f2;
+      padding: 25px;
+    }
+  </style>
+  <script type="text/javascript">
+    // Config API server URL
+    var apiURL='http://127.0.0.1:8000';
+  </script>
+</head>
+<body>
+
+<nav class="navbar navbar-inverse">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>                        
+      </button>
+      <a class="navbar-brand" href="#">Fleetsu Assignment</a>
+    </div>
+  </div>
+</nav>
+
+<div class="">
+  <div class="container text-center">
+    <h1>REST Service and Simple Frontend</h1>      
+  </div>
+</div>
+  
+<div class="container-fluid bg-3 text-center">    
+  <h3>Displays a list of available devices with their statuses</h3><br>
+  <ul class="list-group text-left" id="deviceList">
+    <li class="list-group-item">Device Details <span class="badge">Last Reported Date Time</span></li>
+  </ul>
+
+
+<footer class="container-fluid text-center">
+  <p>Timezone : <span id="timezone"></span></p>
+</footer>
+<script type="text/javascript">
+  $( document ).ready(function() {
+    // Get the timezone
+    // If it's already in storage, just grab from there
+    if (!sessionStorage.getItem('timezone')) {
+      var tz = jstz.determine() || 'UTC';
+      sessionStorage.setItem('timezone', tz.name());
+    }
+    var currTz = sessionStorage.getItem('timezone');
+    $('#timezone').text(currTz);
+    var content = '';
+    function updateTime(theTime) {
+      // Format Moment.js expects:
+      //   2019-08-12T14:30Z
+      // Moment.js can help us build it.
+              
+      // Create a Moment.js object
+      var momentTime = moment(theTime);
+      
+      // Adjust using Moment Timezone
+      var tzTime = momentTime.tz(currTz);
+      
+      // Format the time back to normal
+      var formattedTime = tzTime.format('DD-MM-YYYY h:mm A');
+        return formattedTime;
+      output.textContent = "Time in " + currTz + ": " + formattedTime;
+    }
+     $.ajax({
+                url : apiURL+'/devices',
+                type : 'GET',
+                dataType : 'json',
+                success : function (data)
+                {
+                  $.each( data, function( i, item ) {
+                    content +='<li class="list-group-item">'+item.label+'('+item.id+') <span class="badge">'+updateTime(item.reported)+'</span></li>';
+                    updateTime(item.reported);
+                  });
+                   $(content).appendTo("#deviceList");
+                   
+                }
+            });
+  });
+</script>
+</body>
+</html>
